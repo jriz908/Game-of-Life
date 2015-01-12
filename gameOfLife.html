@@ -1,0 +1,160 @@
+
+<html>
+
+<head>
+<title>Game of Life</title>
+
+
+<script type="text/javascript" src="https://d14to6y4nub5k1.cloudfront.net/local/jquery.min.js"></script>
+<script type="text/javascript" src="https://d14to6y4nub5k1.cloudfront.net/lib/codehs/library_live.js"></script>
+
+
+<style>
+canvas{
+    border: 1px solid black;
+}
+</style>
+
+</head>
+
+<body>
+<h1>Game of Life</h1>
+
+<div id="user-code" style="display:none;">
+// Define constants here
+var LIFE_PROB = 0.4;
+var grid;
+
+
+var NUM_ROWS = 40;
+var NUM_COLS = 40;
+var WIDTH = getWidth()/NUM_COLS;
+var HEIGHT = getHeight()/NUM_ROWS;
+
+
+
+
+function start(){
+    setup();
+    draw();
+    setTimer(generate, 40)
+    
+}
+
+function setup(){
+	setBackgroundColor(Color.BLACK);
+    grid = new Grid(NUM_ROWS,NUM_COLS);
+	
+	for(var i = 0; i < grid.numRows(); i++){
+	    for(var j = 0; j < grid.numCols(); j++){
+	        
+	        var bool = Randomizer.nextBoolean(LIFE_PROB);
+	        
+	        grid.set(i,j,bool);
+	    }
+	}
+}
+
+function draw(){
+    for(var i = 0; i < grid.numRows(); i++){
+	    for(var j = 0; j < grid.numCols(); j++){
+	        drawBox(i,j,grid.get(i,j));
+	    }
+	}
+    
+}
+
+function drawBox(i, j, bool){
+    var box = new Rectangle(WIDTH,HEIGHT);
+    if(!bool){
+        box.setColor(Color.black);
+    }else{
+        box.setColor(Color.cyan)
+    }
+    box.setPosition(j * WIDTH, i * HEIGHT);
+    add(box);
+}
+
+function findLife(x,y){
+    var numLive = 0;
+    
+    
+    for(var i = 0; i < 3; i++){
+	    for(var j = 0; j < 3; j++){
+	        
+	        if(i != 1 || j != 1){
+	            if((x-1+i >= 0 && x-1+i < NUM_COLS) && (y-1+j >= 0 && y-1+j < NUM_ROWS)){
+	                if(grid.get(x-1+i, y-1+j)){
+	                    numLive++;
+	                }
+	            }
+	        }
+	    } 
+	} 
+	
+	
+	if(numLive < 2){
+	    return false;
+ 	}else if(numLive == 2){
+ 	    var bool = grid.get(x,y)
+ 	    return bool;
+ 	}else if (numLive == 3){
+ 	    return true;
+ 	}else{
+ 	    return false;
+ 	}
+    
+    
+}
+
+function generate(){
+    var newGrid = new Grid(NUM_ROWS,NUM_COLS);
+    
+    for(var i = 0; i < grid.numRows(); i++){
+	    for(var j = 0; j < grid.numCols(); j++){
+	       newGrid.set(i,j,findLife(i,j));
+	       
+	    }
+	    
+	    
+	}
+	
+	for(var i = 0; i < grid.numRows(); i++){
+	    for(var j = 0; j < grid.numCols(); j++){
+	       grid.set(i,j,newGrid.get(i,j));
+	    }
+	}
+	
+	for(var i = 0; i < grid.numRows(); i++){
+	    for(var j = 0; j < grid.numCols(); j++){
+	        var cell = getElementAt(j * WIDTH , i * HEIGHT);
+	        
+	        if(grid.get(i,j)){
+	            cell.setColor(Color.cyan);
+	        }else{
+	            cell.setColor(Color.black);
+	        }
+	    }
+	}
+	
+    
+}
+
+</div>
+
+<canvas 
+width="900"
+height="900"
+class="codehs-editor-canvas"></canvas>
+
+<script>
+var g = new CodeHSGraphics({
+    canvas: $('.codehs-editor-canvas')
+});
+// run test # here.
+g.runCode($("#user-code").text());
+
+</script>
+
+</body>
+</html>
